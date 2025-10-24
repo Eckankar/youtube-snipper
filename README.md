@@ -1,6 +1,6 @@
 # YouTube Snipper 🎬✂️
 
-**YouTube Snipper** is a powerful yet user-friendly web application that lets you extract and combine the best moments from any YouTube video (or other supported video sources) into a single compilation clip. Perfect for creating highlight reels, funny moment compilations, or condensing long videos into their most valuable segments.
+**YouTube Snipper** is a simple little web application that lets you extract and combine the best moments from any YouTube video (or other supported video sources) into a single compilation clip. Perfect for creating highlight reels, funny moment compilations, or condensing long videos into their most valuable segments.
 
 ## ✨ What Does It Do?
 
