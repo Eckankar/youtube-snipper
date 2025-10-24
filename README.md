@@ -13,6 +13,8 @@ Ever watched a long video and wished you could just extract the best parts? YouT
 
 Whether you're creating gaming highlights, educational summaries, or comedy compilations, YouTube Snipper streamlines the entire process into a simple, intuitive workflow.
 
+![YouTube Snipper Editor Screenshot](docs/screenshots/screenshot_initial_release_2025-10-24.png)
+
 ---
 
 ## 🚀 Quick Start
