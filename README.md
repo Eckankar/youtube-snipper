@@ -27,11 +27,16 @@ You can run YouTube Snipper by simply downloading the [docker-compose.yml](https
    - [Get the file here](https://github.com/Eckankar/youtube-snipper/raw/main/docker-compose.yml)
    - Place it in a folder (e.g. `youtube-snipper`)
 
-2. **Create a `.env` file for permissions**
+2. **Create a `.env` file for configuration**
    - Download [`.env.example`](https://github.com/Eckankar/youtube-snipper/raw/main/.env.example) to the same folder and rename it to `.env`
-   - Edit `.env`:
-     - **Windows users**: Use `UID=1000` and `GID=1000`
-     - **Mac/Linux users**: Run `id -u` and `id -g` to get your IDs, then update `.env`
+   - Edit `.env` and configure:
+     - **User permissions:**
+       - **Windows users**: Use `UID=1000` and `GID=1000`
+       - **Mac/Linux users**: Run `id -u` and `id -g` to get your IDs, then update `.env`
+     - **Projects folder:** Set `PROJECTS_PATH` to where you want to store downloaded videos and projects
+       - **Windows example**: `PROJECTS_PATH=C:/Users/YourName/youtube-snipper-data`
+       - **Mac/Linux example**: `PROJECTS_PATH=/home/yourname/youtube-snipper-data`
+       - If not set, defaults to `./projects` (a subfolder next to docker-compose.yml)
 
 3. **Start the app**
    ```bash
@@ -59,7 +64,7 @@ If you want to modify the code or run in development mode:
    cd youtube-snipper
    ```
 
-2. **Configure user permissions**
+2. **Configure user permissions and projects folder**
    ```bash
    # On Windows (PowerShell):
    copy .env.example .env
@@ -67,7 +72,11 @@ If you want to modify the code or run in development mode:
    # On Mac/Linux:
    cp .env.example .env
    ```
-   - Edit `.env` as above for your OS
+   - Edit `.env`:
+     - **User permissions:** Set `UID` and `GID` as above for your OS
+     - **Projects folder:** Set `PROJECTS_PATH` to your desired location
+       - If not set, defaults to `./projects` (a subfolder in the repository)
+       - Consider using a location outside the repo if you want to persist data across repo updates
 
 3. **Start the application**
    ```bash
@@ -242,6 +251,7 @@ You can manually trigger the workflow from the Actions tab on GitHub.
 ### Environment Variables
 
 - `UID` / `GID` - User/group ID for file permissions
+- `PROJECTS_PATH` - Path to store downloaded videos and project data (defaults to ./projects)
 - `FLASK_ENV` - Flask environment (development/production)
 - `REDIS_URL` - Redis connection string
 - `LOG_LEVEL` - Logging verbosity (debug/info/warning/error)

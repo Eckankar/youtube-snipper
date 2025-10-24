@@ -5,7 +5,7 @@ services:
   backend:
     image: ghcr.io/eckankar/youtube-snipper-backend:latest
     volumes:
-      - ./projects:/app/projects
+      - ${PROJECTS_PATH:-./projects}:/app/projects
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
     user: "${UID:-1000}:${GID:-1000}"
@@ -21,7 +21,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./projects:/app/projects
+      - ${PROJECTS_PATH:-./projects}:/app/projects
     depends_on:
       - backend
     environment:

@@ -5,7 +5,7 @@ services:
   backend:
     build: ./backend
     volumes:
-      - ./projects:/app/projects
+      - ${PROJECTS_PATH:-./projects}:/app/projects
       - ./backend:/app
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
@@ -22,7 +22,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./projects:/app/projects
+      - ${PROJECTS_PATH:-./projects}:/app/projects
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
     depends_on:
