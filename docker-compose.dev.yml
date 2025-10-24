@@ -3,25 +3,28 @@ services:
     image: redis:7-alpine
 
   backend:
-    image: ghcr.io/eckankar/youtube-snipper-backend:latest
+    build: ./backend
     volumes:
       - ./projects:/app/projects
+      - ./backend:/app
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
     user: "${UID:-1000}:${GID:-1000}"
     environment:
-      - FLASK_ENV=production
+      - FLASK_ENV=development
       - REDIS_URL=redis://redis:6379/0
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=debug
     depends_on:
       - redis
 
   frontend:
-    image: ghcr.io/eckankar/youtube-snipper-frontend:latest
+    build: ./frontend
     ports:
       - "3000:3000"
     volumes:
       - ./projects:/app/projects
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
     depends_on:
       - backend
     environment:

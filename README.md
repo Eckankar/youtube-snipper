@@ -15,71 +15,67 @@ Whether you're creating gaming highlights, educational summaries, or comedy comp
 
 ---
 
-## 🚀 Quick Start (For Everyone)
+## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: One-File Install (No Cloning Needed)
 
-You only need two things installed on your computer:
-- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** (Windows/Mac/Linux)
-- **A web browser** (Chrome, Firefox, Safari, etc.)
+You can run YouTube Snipper by simply downloading the [docker-compose.yml](https://github.com/Eckankar/youtube-snipper/raw/main/docker-compose.yml) file and placing it in a folder on your computer. This works great with platforms like **Dockge**, **Portainer**, or any system that can run Docker Compose.
 
-That's it! Docker will handle everything else automatically.
+1. **Download docker-compose.yml**
+   - [Get the file here](https://github.com/Eckankar/youtube-snipper/raw/main/docker-compose.yml)
+   - Place it in a folder (e.g. `youtube-snipper`)
 
-### Installation & Running
+2. **Create a `.env` file for permissions**
+   - Download [`.env.example`](https://github.com/Eckankar/youtube-snipper/raw/main/.env.example) to the same folder and rename it to `.env`
+   - Edit `.env`:
+     - **Windows users**: Use `UID=1000` and `GID=1000`
+     - **Mac/Linux users**: Run `id -u` and `id -g` to get your IDs, then update `.env`
 
-1. **Download this project**
-   - Click the green "Code" button at the top of this page → "Download ZIP"
-   - Extract the ZIP file to a folder on your computer
-   
-   *OR if you know Git:*
+3. **Start the app**
    ```bash
-   git clone https://github.com/yourusername/youtube-snipper.git
+   docker-compose up
+   ```
+   Or use your Docker Compose GUI (Dockge, Portainer, etc.) to start the stack.
+
+4. **Open the app**
+   - Go to [http://localhost:3000](http://localhost:3000) in your browser
+
+5. **Stop the app**
+   ```bash
+   docker-compose down
+   ```
+
+---
+
+### Option 2: Manual Install (Clone the Repo)
+
+If you want to modify the code or run in development mode:
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Eckankar/youtube-snipper.git
    cd youtube-snipper
    ```
 
-2. **Configure user permissions** (important!)
-   
-   Copy the example configuration file:
+2. **Configure user permissions**
    ```bash
    # On Windows (PowerShell):
    copy .env.example .env
-   
+
    # On Mac/Linux:
    cp .env.example .env
    ```
-   
-   Then edit the `.env` file:
-   - **Windows users**: Set both `UID=1000` and `GID=1000` (already the default)
-   - **Mac/Linux users**: Run these commands to find your IDs, then update `.env`:
-     ```bash
-     id -u    # Your user ID
-     id -g    # Your group ID
-     ```
+   - Edit `.env` as above for your OS
 
 3. **Start the application**
-   
-   Open a terminal/command prompt in the project folder and run:
    ```bash
-   docker-compose up --build
+   docker-compose up
    ```
-   
-   First-time setup takes 2-5 minutes as Docker downloads everything needed.
-   
-   You'll know it's ready when you see messages like:
-   ```
-   backend_1   | Booting worker with pid: ...
-   frontend_1  | webpack compiled successfully
-   ```
-
-   Note: only the frontend service is exposed to your host (http://localhost:3000). The backend and Redis services run inside the Docker network and are reachable from the frontend via the internal hostnames (backend, redis). They are not bound to host ports by default.
 
 4. **Open the app**
-   
-   Go to **http://localhost:3000** in your web browser
+   - Go to [http://localhost:3000](http://localhost:3000)
 
-5. **Stop the application**
-   
-   Press `Ctrl+C` in the terminal, then run:
+5. **Stop the app**
    ```bash
    docker-compose down
    ```
@@ -129,6 +125,9 @@ Once the video downloads, you'll see the editor interface:
 
 ```
 youtube-snipper/
+├── .github/
+│   └── workflows/
+│       └── docker-publish.yml  # CI/CD for building images
 ├── backend/          # Flask API (Python)
 │   ├── app.py       # Main application logic
 │   └── Dockerfile
@@ -138,7 +137,8 @@ youtube-snipper/
 │   │   └── App.js
 │   └── Dockerfile
 ├── projects/         # Stored project data (created automatically)
-└── docker-compose.yml
+├── docker-compose.yml      # Production setup (uses pre-built images)
+└── docker-compose.dev.yml  # Development setup (builds locally)
 ```
 
 ### Tech Stack
@@ -146,14 +146,30 @@ youtube-snipper/
 - **Backend**: Flask, yt-dlp, FFmpeg, Redis
 - **Frontend**: React, ReactPlayer, Axios
 - **Infrastructure**: Docker, Docker Compose
+- **CI/CD**: GitHub Actions, GitHub Container Registry
 
 ### Development Setup
+
+#### Option 1: Using Pre-built Images (Quick Start)
+
+Use this if you just want to run the app without modifying code:
+
+```bash
+# Clone and configure (see Quick Start above)
+docker-compose up
+```
+
+Images are automatically pulled from GitHub Container Registry.
+
+#### Option 2: Local Development with Hot Reload
+
+Use this if you want to modify the code and see changes immediately:
 
 1. **Clone and configure** (see Quick Start above)
 
 2. **Start in development mode**:
    ```bash
-   docker-compose up --build
+   docker-compose -f docker-compose.dev.yml up --build
    ```
 
 3. **Access services**:
@@ -161,18 +177,54 @@ youtube-snipper/
    - Backend API: accessible from the frontend at /api via the frontend proxy (not exposed to the host by default)
    - Redis: internal to the Docker network (not exposed to the host by default)
 
-If you need to access the backend or Redis directly from your host (for debugging), either:
-- Temporarily add port mappings back to docker-compose.yml for the relevant service(s), or
-- Use docker-compose exec to run commands inside a container, e.g.:
-  ```bash
-  docker-compose exec backend /bin/sh
-  docker-compose exec redis redis-cli -h redis
-  ```
-
 4. **Development features**:
    - Hot reload enabled for both frontend and backend
+   - Source code mounted as volumes
    - Logs visible in terminal
-   - Projects directory mounted as volume (persists across restarts)
+   - Projects directory persists across restarts
+
+If you need to access the backend or Redis directly from your host (for debugging), either:
+- Temporarily add port mappings to docker-compose.dev.yml for the relevant service(s), or
+- Use docker-compose exec to run commands inside a container:
+  ```bash
+  docker-compose -f docker-compose.dev.yml exec backend /bin/sh
+  docker-compose -f docker-compose.dev.yml exec redis redis-cli -h redis
+  ```
+
+### Switching Between Modes
+
+**Production (pre-built images):**
+```bash
+docker-compose up
+```
+
+**Development (local builds):**
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+### Building and Testing Images Locally
+
+To test your changes before pushing:
+
+```bash
+# Build images locally
+docker-compose -f docker-compose.dev.yml build
+
+# Run with local builds
+docker-compose -f docker-compose.dev.yml up
+```
+
+### CI/CD Pipeline
+
+When you push to the `main` branch, GitHub Actions automatically:
+1. Builds both backend and frontend Docker images
+2. Tags them with `latest` and the git SHA
+3. Pushes them to GitHub Container Registry at:
+   - `ghcr.io/eckankar/youtube-snipper-backend:latest`
+   - `ghcr.io/eckankar/youtube-snipper-frontend:latest`
+
+You can manually trigger the workflow from the Actions tab on GitHub.
 
 ### API Endpoints
 
@@ -207,10 +259,15 @@ If you need to access the backend or Redis directly from your host (for debuggin
 **Docker issues:**
 - Try `docker-compose down -v` to clean up, then rebuild
 - Make sure Docker Desktop is running
+- For development: `docker-compose -f docker-compose.dev.yml down -v`
 
 **Frontend won't load:**
 - Wait 30 seconds after "webpack compiled" message
 - Try hard refresh (Ctrl+Shift+R / Cmd+Shift+R)
+
+**Images not updating:**
+- Pull latest images: `docker-compose pull`
+- For development, rebuild: `docker-compose -f docker-compose.dev.yml up --build`
 
 ---
 
