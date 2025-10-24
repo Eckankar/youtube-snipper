@@ -1,0 +1,34 @@
+services:
+  redis:
+    image: redis:7-alpine
+  backend:
+    build: ./backend
+    volumes:
+      - ./projects:/app/projects
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+    user: "${UID:-1000}:${GID:-1000}"
+    environment:
+      - FLASK_ENV=development
+      - REDIS_URL=redis://redis:6379/0
+      - LOG_LEVEL=debug
+    depends_on:
+      - redis
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./projects:/app/projects
+    depends_on:
+      - backend
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - HOST=0.0.0.0
+      - REACT_APP_API_URL=http://backend:5000
+    command: npm start
+
+volumes:
+  projects:
+    driver: local
