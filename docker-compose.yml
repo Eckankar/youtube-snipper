@@ -19,17 +19,12 @@ services:
   frontend:
     image: ghcr.io/eckankar/youtube-snipper-frontend:latest
     ports:
-      - "3000:3000"
-    volumes:
-      - ${PROJECTS_PATH:-./projects}:/app/projects
+      - "3000:80"
     depends_on:
       - backend
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - HOST=0.0.0.0
-      - REACT_APP_API_URL=http://backend:5000
-    command: npm start
 
 volumes:
+  projects:
+    driver: local
   projects:
     driver: local

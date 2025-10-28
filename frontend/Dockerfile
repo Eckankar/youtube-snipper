@@ -1,19 +1,22 @@
-FROM node:18-alpine
-
+# Build stage
+FROM node:18-alpine AS build
 WORKDIR /app
 
-# Ensure proxy points to the backend service in Docker
-ENV REACT_APP_API_URL=http://backend:5000
-
-# Copy package files
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies as root first
-RUN npm install
-
-# Copy source code
 COPY . .
+RUN npm run build
 
-EXPOSE 3000
+# Serve stage
+FROM nginx:alpine
+WORKDIR /usr/share/nginx/html
 
-CMD ["npm", "start"]
+# Copy build output
+COPY --from=build /app/dist ./
+
+# Nginx config for SPA + API proxy
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

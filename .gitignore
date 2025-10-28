@@ -2,3 +2,4 @@ projects/
 .cache/
 .env
 .private/
+backend/__pycache__/
